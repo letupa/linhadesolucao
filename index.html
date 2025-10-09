@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linha de Solução</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: linear-gradient(135deg, #004AAD, #00B4D8); color: #fff; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+  header { text-align: center; margin-bottom: 30px; background-color: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  h1 { font-size: 2.2em; color: #FFD60A; margin-bottom: 6px; text-shadow: 2px 2px 6px rgba(0,0,0,0.3); }
+  h2 { font-size: 1em; font-weight: 400; color: #E0E0E0; }
+  .welcome { background: rgba(255, 255, 255, 0.08); padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); text-align: center; margin-bottom: 20px; max-width: 900px; line-height: 1.5; }
+  .bold { font-weight: bold; color: #FFD60A; }
+  .menu { background: rgba(0,0,0,0.15); border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); width: 100%; max-width: 900px; }
+  button { background: #FFD60A; border: none; color: #000; font-weight: 700; padding: 12px 16px; margin: 10px 0; border-radius: 10px; cursor: pointer; transition: all 0.18s ease; width: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  button.small { width: auto; padding: 8px 12px; display: inline-block; }
+  button:hover { transform: translateY(-2px); }
+  textarea, select, input[type=text], input[type=tel], input[type=number] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; font-size: 1em; }
+  .hidden { display: none; }
+  footer { margin-top: 18px; font-size: 0.9em; color: #E0E0E0; opacity: 0.8; }
+  ul { text-align: left; margin-left: 20px; line-height: 1.6; }
+  li { margin-bottom: 6px; }
+  .muted { color: rgba(224,224,224,0.9); font-size: 0.95em; }
+  .success { margin-top:10px; padding:10px; background: rgba(16,185,129,0.12); border-radius:8px; color:#10b981; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Linha de Solução</h1>
+  <h2>Canal Corporativo de Atendimento ao Colaborador</h2>
+</header>
+
+<section class="welcome">
+  <p><strong>Bem-vindo(a) ao Linha de Solução!</strong><br>
+  Este canal foi criado para esclarecer dúvidas, registrar reclamações, dar feedbacks e conhecer melhor seus direitos e benefícios.<br>
+  Todas as informações aqui registradas são <span class="bold">100% Sigilosas</span>. Apenas o setor de Recursos Humanos tem acesso às respostas. Sua identidade é preservada e todas as respostas são anônimas.</p>
+</section>
+
+<!-- MAIN MENU -->
+<section class="menu" id="mainMenu">
+  <button onclick="showSection('consultas')">Consultas Rápidas</button>
+  <button onclick="showSection('reclamacoes')">Reclamações</button>
+  <button onclick="showSection('sugestoes')">Sugestões de Melhorias</button>
+  <button onclick="showSection('psicologos')">Psicólogos</button>
+  <button onclick="showSection('rh')">Falar com o RH</button>
+</section>
+
+<!-- CONSULTAS -->
+<section id="consultas" class="menu hidden">
+  <h3>Consultas Rápidas</h3>
+  <div class="muted">Escolha um tópico para ver a explicação detalhada.</div>
+  <button onclick="showContent('planos')">Plano de Saúde</button>
+  <button onclick="showContent('beneficios')">Benefícios</button>
+  <button onclick="showContent('regras')">Regras Internas</button>
+  <button onclick="showContent('rescisao')">Rescisão / Demissão</button>
+  <button onclick="showContent('atestados')">Atestados</button>
+  <button onclick="showContent('direitos')">Direitos dos Funcionários</button>
+  <button class="small" onclick="backToMenu()">← Voltar</button>
+</section>
+
+<!-- AREA DE CONTEÚDO DINÂMICO -->
+<section id="conteudoDetalhado" class="menu hidden"></section>
+
+<!-- RECLAMAÇÕES -->
+<section id="reclamacoes" class="menu hidden">
+  <h3>Registrar Reclamação</h3>
+  <label for="rec-setor">Setor</label>
+  <select id="rec-setor">
+    <option value="">Selecione um setor...</option>
+    <option>Administrativo</option>
+    <option>Financeiro</option>
+    <option>Comercial</option>
+    <option>Operacional</option>
+    <option>Logística</option>
+    <option>Recursos Humanos</option>
+  </select>
+  <label for="rec-text">Reclamação</label>
+  <textarea id="rec-text" placeholder="Descreva sua reclamação (sem limite de caracteres)"></textarea>
+  <label for="rec-urg">É urgente?</label>
+  <select id="rec-urg"><option>Não</option><option>Sim</option></select>
+  <button id="send-rec-btn">Enviar Reclamação</button>
+  <div id="rec-result"></div>
+  <button class="small" onclick="backToMenu()">← Voltar</button>
+</section>
+
+<!-- SUGESTÕES -->
+<section id="sugestoes" class="menu hidden">
+  <h3>Sugestões de Melhorias</h3>
+  <label for="sug-setor">Setor</label>
+  <select id="sug-setor">
+    <option value="">Selecione um setor...</option>
+    <option>Administrativo</option>
+    <option>Financeiro</option>
+    <option>Comercial</option>
+    <option>Operacional</option>
+    <option>Logística</option>
+    <option>Recursos Humanos</option>
+  </select>
+  <label for="sug-text">Sugestão</label>
+  <textarea id="sug-text" placeholder="Deixe sua sugestão (sem limite de caracteres)"></textarea>
+  <label for="sug-urg">É urgente?</label>
+  <select id="sug-urg"><option>Não</option><option>Sim</option></select>
+  <button id="send-sug-btn">Enviar Sugestão</button>
+  <div id="sug-result"></div>
+  <button class="small" onclick="backToMenu()">← Voltar</button>
+</section>
+
+<!-- PSICÓLOGOS -->
+<section id="psicologos" class="menu hidden">
+  <h3>Psicólogos</h3>
+  <p class="muted">Agende um horário com o psicólogo da empresa (Segunda a Sexta).</p>
+  <label for="psy-day">Dia</label>
+  <select id="psy-day">
+    <option>Segunda-feira</option>
+    <option>Terça-feira</option>
+    <option>Quarta-feira</option>
+    <option>Quinta-feira</option>
+    <option>Sexta-feira</option>
+  </select>
+  <label for="psy-time">Horário</label>
+  <select id="psy-time">
+    <option>09:00</option>
+    <option>10:00</option>
+    <option>11:00</option>
+    <option>13:00</option>
+    <option>14:00</option>
+    <option>15:00</option>
+    <option>16:00</option>
+  </select>
+  <button id="book-psy-btn">Agendar Horário</button>
+  <div id="psy-result"></div>
+
+  <h4>Psicólogos indicados (externos)</h4>
+  <p class="muted">
+    - Ana Silva — (11) 99999-1111<br>
+    - João Santos — (11) 98888-2222<br>
+    - Clara Costa — (21) 97777-3333
+  </p>
+  <button class="small" onclick="backToMenu()">← Voltar</button>
+</section>
+
+<!-- RH -->
+<section id="rh" class="menu hidden">
+  <h3>Falar com o RH — WhatsApp</h3>
+  <p class="muted">⚠️ Atenção: ao prosseguir você perderá o anonimato.</p>
+  <label for="rh-phone">Seu número (com DDD)</label>
+  <input id="rh-phone" type="tel" placeholder="Ex: 11999998888">
+  <label for="rh-urg">É urgente?</label>
+  <select id="rh-urg"><option>Não</option><option>Sim</option></select>
+  <button id="open-whatsapp">Falar Agora (WhatsApp)</button>
+  <button class="small" onclick="backToMenu()">← Voltar</button>
+</section>
+
+<footer>&copy; 2025 - Linha de Solução | Recursos Humanos Corporativo</footer>
+
+<script>
+// --- Helpers ---
+function hideAll(){ document.querySelectorAll('.menu').forEach(m=>m.classList.add('hidden')); }
+function showSection(id){ hideAll(); const el=document.getElementById(id); if(el) el.classList.remove('hidden'); else console.warn('showSection: elemento não encontrado',id);}
+function backToMenu(){ hideAll(); document.getElementById('mainMenu').classList.remove('hidden'); }
+
+// --- Conteúdo detalhado ---
+function showContent(tipo){
+  hideAll();
+  const content=document.getElementById('conteudoDetalhado'); let texto='';
+  switch(tipo){
+    case 'planos': texto=`<h3>Planos de Saúde</h3>
+      <ul>
+        <li><strong>Plano Amplo (Faixa A):</strong> Cobertura nacional completa, internações, cirurgias, especialistas, exames complexos e acomodação em apartamento; coparticipação baixa.</li>
+        <li><strong>Plano Intermediário (Faixa B):</strong> Cobertura regional, consultas e internações básicas, acomodação conforme contrato.</li>
+        <li><strong>Plano Básico (Faixa C):</strong> Consultas básicas e urgências, indicado para cargos de menor necessidade de cobertura ampla.</li>
+        <li><strong>Plano Odontológico:</strong> Limpeza, restaurações, endodôntico, próteses e ortodontia.</li>
+        <li><strong>Telemedicina:</strong> Atendimento remoto 24h.</li>
+      </ul>
+      <p class="muted">Consulte o RH para detalhes de carência e rede credenciada.</p>`; break;
+    case 'beneficios': texto=`<h3>Benefícios</h3>
+      <ul>
+        <li><strong>Vale Transporte:</strong> Conforme deslocamento, desconto legal.</li>
+        <li><strong>Vale Refeição / Alimentação:</strong> Cartão ou crédito mensal.</li>
+        <li><strong>Plano de Saúde e Odontológico:</strong> Convênios corporativos.</li>
+        <li><strong>Seguro de Vida:</strong> Cobertura em acidentes e morte.</li>
+        <li><strong>Auxílio Creche:</strong> Apoio para filhos pequenos.</li>
+        <li><strong>PLR / Bônus:</strong> Pagamento variável conforme metas.</li>
+        <li><strong>Programas de Bem-Estar:</strong> Psicologia, ginástica laboral, campanhas de saúde.</li>
+      </ul>
+      <p class="muted">Consulte o RH para elegibilidade e regras específicas.</p>`; break;
+    case 'regras': texto=`<h3>Regras Internas e Cultura</h3>
+      <ul>
+        <li><strong>Pontualidade e assiduidade:</strong> Registro de ponto, tolerâncias e banco de horas.</li>
+        <li><strong>Conduta e ética:</strong> Proibição de discriminação e assédio.</li>
+        <li><strong>Uso de equipamentos:</strong> Somente fins profissionais.</li>
+        <li><strong>Dress Code:</strong> Vestimenta adequada.</li>
+        <li><strong>Férias e licenças:</strong> Solicitação com antecedência mínima e cumprimento do período aquisitivo.</li>
+        <li><strong>Segurança do Trabalho:</strong> Uso obrigatório de EPIs e treinamentos.</li>
+      </ul>
+      <p class="muted">Consulte manual do colaborador e RH para procedimentos detalhados.</p>`; break;
+    case 'rescisao': texto=`<h3>Rescisão / Demissão</h3>
+      <ul>
+        <li><strong>Tipos:</strong> Sem justa causa, com justa causa (Art. 482 CLT), pedido de demissão, término por prazo determinado, acordo.</li>
+        <li><strong>Rescisão sem justa causa:</strong> Aviso prévio, 13º proporcional, férias proporcionais +1/3, FGTS e multa 40%.</li>
+        <li><strong>Justa causa:</strong> Violações graves, perda de certos direitos.</li>
+        <li><strong>Procedimentos:</strong> Conferência de documentos e pagamento até 10 dias.</li>
+      </ul>
+      <p class="muted">Consulte RH ou advogado para casos específicos.</p>`; break;
+    case 'atestados': texto=`<h3>Atestados Médicos</h3>
+      <ul>
+        <li><strong>Tipos:</strong> Médico, odontológico, psicológico, pericial.</li>
+        <li><strong>Entrega:</strong> Apresente ao RH o quanto antes.</li>
+        <li><strong>Exigências:</strong> Carimbo, assinatura e identificação do profissional.</li>
+        <li><strong>Atestado falso:</strong> Considerado fraude, pode gerar demissão e sanções.</li>
+        <li><strong>Sigilo:</strong> Diagnóstico confidencial, RH solicita apenas duração do afastamento.</li>
+      </ul>`; break;
+    case 'direitos': texto=`<h3>Direitos dos Funcionários (CLT)</h3>
+      <ul>
+        <li><strong>FGTS:</strong> Depósito de 8% em conta vinculada; saque em situações previstas por lei.</li>
+        <li><strong>13º salário:</strong> Pago em até duas parcelas proporcional ao tempo trabalhado.</li>
+        <li><strong>INSS:</strong> Benefícios previdenciários.</li>
+        <li><strong>Férias:</strong> 30 dias a cada 12 meses +1/3 salário.</li>
+        <li><strong>Licença-maternidade:</strong> 120 dias, podendo ser estendida.</li>
+        <li><strong>Licença-paternidade:</strong> Mínimo legal de 5 dias.</li>
+        <li><strong>Horas extras / adicional noturno:</strong> Conforme percentuais legais.</li>
+        <li><strong>Seguro-desemprego:</strong> Benefício temporário quando requisitos atendidos.</li>
+      </ul>
+      <p class="muted">Consulte RH e legislação vigente para informações detalhadas.</p>`; break;
+    default: texto='<p class="muted">Tópico não encontrado.</p>';
+  }
+  content.innerHTML=texto+'<div style="margin-top:12px"><button id="backFromContent" class="small">← Voltar</button></div>';
+  content.classList.remove('hidden');
+  const backBtn=document.getElementById('backFromContent'); if(backBtn) backBtn.addEventListener('click',function(){ showSection('consultas'); });
+}
+
+// --- Storage & Actions ---
+function saveRecord(type,data){ const key='LS_records_v1'; const all=JSON.parse(localStorage.getItem(key)||'[]'); all.push({type:type,data:data,createdAt:new Date().toISOString()}); localStorage.setItem(key,JSON.stringify(all)); }
+
+document.getElementById('send-rec-btn').addEventListener('click',function(){
+  const setor=document.getElementById('rec-setor').value; const texto=document.getElementById('rec-text').value.trim(); const urg=document.getElementById('rec-urg').value;
+  if(!setor) return alert('Selecione um setor'); if(!texto) return alert('Descreva a reclamação');
+  saveRecord('reclamacao',{setor,texto,urg}); document.getElementById('rec-result').innerHTML='<div class="success">Reclamação enviada com sucesso. Obrigado.</div>'; document.getElementById('rec-text').value='';
+});
+
+document.getElementById('send-sug-btn').addEventListener('click',function(){
+  const setor=document.getElementById('sug-setor').value; const texto=document.getElementById('sug-text').value.trim(); const urg=document.getElementById('sug-urg').value;
+  if(!setor) return alert('Selecione um setor'); if(!texto) return alert('Descreva a sugestão');
+  saveRecord('sugestao',{setor,texto,urg}); document.getElementById('sug-result').innerHTML='<div class="success">Sugestão enviada com sucesso. Obrigado.</div>'; document.getElementById('sug-text').value='';
+});
+
+document.getElementById('book-psy-btn').addEventListener('click',function(){
+  const day=document.getElementById('psy-day').value; const time=document.getElementById('psy-time').value;
+  saveRecord('agendamento_psicologo',{day,time}); document.getElementById('psy-result').innerHTML='<div class="success">Horário reservado. O RH será notificado.</div>';
+});
+
+document.getElementById('open-whatsapp').addEventListener('click',function(){
+  const phone=document.getElementById('rh-phone').value.trim(); const urg=document.getElementById('rh-urg').value;
+  if(!phone) return alert('Informe seu número de telefone com DDD');
+  const text=encodeURIComponent(`Olá RH, preciso de atendimento. Número informado: ${phone}. Urgente: ${urg}.`);
+  const RH_WHATSAPP_NUMBER='+5511999999999'; // substitua pelo número real
+  const url=`https://api.whatsapp.com/send?phone=${RH_WHATSAPP_NUMBER.replace(/[^0-9+]/g,'')}&text=${text}`;
+  window.open(url,'_blank');
+});
+
+// --- Show main menu by default ---
+showSection('mainMenu');
+</script>
+</body>
+</html>
