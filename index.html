@@ -48,20 +48,103 @@
     @media (max-width: 880px) { .gloss { grid-template-columns: 1fr; } }
     .gloss-item { background: rgba(0,0,0,0.22); border-radius: 12px; padding: 12px; }
     .gloss-item h4 { margin: 0 0 6px 0; }
-  </style>
+  
+/* WhatsApp RH button */
+.whatsapp-btn{background:#25D366;color:#fff;display:inline-flex;gap:8px;align-items:center;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.15);transition:transform .15s ease, background .15s ease; margin-top:10px}
+.whatsapp-btn:hover{background:#1EBE5D;transform:translateY(-1px)}
+.whatsapp-icon{width:18px;height:18px;display:inline-block}
+
+
+/* WhatsApp Flutuante (Home) */
+.wa-float{position:fixed;right:18px;bottom:18px;z-index:9999;display:none}
+.wa-float a{background:#25D366;color:#fff;display:inline-flex;gap:8px;align-items:center;padding:12px 16px;border-radius:999px;text-decoration:none;font-weight:800;box-shadow:0 10px 24px rgba(0,0,0,.22);transition:transform .15s ease, background .15s ease}
+.wa-float a:hover{background:#1EBE5D;transform:translateY(-1px)}
+.wa-float svg{width:18px;height:18px}
+@media (max-width:560px){
+  .wa-float{right:12px;bottom:12px}
+  .wa-float a{padding:12px 14px}
+  .wa-float span{display:none} /* deixa só o ícone no mobile pra não poluir */
+}
+@media (prefers-reduced-motion: reduce){
+  .wa-float a{transition:none}
+}
+
+</style>
 </head>
 <body>
   <header>
-    <h1>Linha de Solução</h1>
+    
     <h2>Canal Corporativo de Atendimento ao Colaborador</h2>
   </header>
 
-  <section class="welcome">
-    <p><strong>Bem-vindo(a) ao Linha de Solução!</strong><br>Este canal foi criado para esclarecer dúvidas, registrar reclamações, dar feedbacks e conhecer melhor seus direitos e benefícios.<br><strong>Todas as informações aqui registradas são 100% sigilosas.</strong> Apenas o setor de Recursos Humanos tem acesso às respostas. Sua identidade é preservada e todas as respostas são anônimas.<br><br>
-    Canal para esclarecer dúvidas, registrar reclamações e conhecer seus direitos e benefícios.<br>
-    Informações com base na <span class="bold">CLT</span> e práticas usuais de mercado.</p>
-    <p class="disclaimer"><strong>Aviso:</strong> Conteúdo informativo. Pode haver variações por acordo/CC e atualizações legais. Para casos concretos, acione o RH/jurídico.</p>
-  </section>
+  
+<!-- HERO LOGO (animado) -->
+<style>
+  .hero-logo{ 
+    background: linear-gradient(135deg, #0b1f3a 0%, #0b335a 100%);
+    padding: 28px 16px 24px; 
+    display:flex; align-items:center; justify-content:center; 
+    border-radius: 16px; margin: 8px 0 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+  .hero-wrap{ display:flex; gap:16px; align-items:center; justify-content:center; flex-wrap:wrap }
+  .hero-title{
+  color:#FFD60A;
+  font-weight:800;
+  font-size:clamp(20px,3.4vw,32px);
+  line-height:1.1;
+  margin:-6px 0 0;
+  text-align:center;
+  animation: fadeUp 1.2s ease-out both, goldGlow 3.5s ease-in-out infinite;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes goldGlow {
+  0%, 100% { text-shadow: 0 0 2px #FFD60A, 0 0 4px #FFD60A; opacity:0.9; }
+  50% { text-shadow: 0 0 6px #FFEB99, 0 0 12px #FFD60A; opacity:1; }
+}
+  100% { text-shadow: 0 0 6px #FFEB99, 0 0 10px #FFD60A; opacity:1; }
+}
+  100% { text-shadow: 0 0 12px #FFEE88, 0 0 20px #FFD60A; }
+}
+  .hero-sub{ color:#e8eef7; font-weight:500; margin:0; text-align:center; font-size: clamp(12px,2.4vw,14px) }
+  .hero-logo svg{ width:72px; height:72px; }
+  @media (min-width: 800px){
+    .hero-logo svg{ width:84px; height:84px; }
+  }
+  /* Animações */
+  .bubble{ transform-origin:center; animation:bubbleIn .6s ease-out both }
+  .check{ stroke-dasharray: 220; stroke-dashoffset: 220; animation: draw .9s .35s ease-out forwards }
+  @keyframes bubbleIn { from{ transform:scale(.85); opacity:0 } to{ transform:scale(1); opacity:1 } }
+  @keyframes draw { to{ stroke-dashoffset: 0 } }
+</style>
+<section class="hero-logo" aria-label="Logotipo Linha de Solução">
+  <div class="hero-wrap">
+    <div class="hero-logo">
+      <!-- SVG do balão + check (cores do branding) -->
+      <svg viewBox="0 0 100 100" role="img" aria-label="Ícone de diálogo com check">
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#FFD60A" flood-opacity=".55"/>
+          </filter>
+        </defs>
+        <!-- Balão -->
+        <path class="bubble" d="M18 20 h52 a10 10 0 0 1 10 10 v28 a10 10 0 0 1-10 10 H40 L26 82 28 68 H18 a10 10 0 0 1-10-10 V30 a10 10 0 0 1 10-10z" fill="#1262d5"/>
+        <!-- Check animado -->
+        <path class="check" d="M32 48 L45 60 L70 35" fill="none" stroke="#FFD60A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+      </svg>
+    </div>
+    <div style="text-align:center">
+      <h1 class="hero-title">Linha de Solução</h1>
+      
+    </div>
+  </div>
+</section>
+<!-- /HERO LOGO -->
+
+<section class="welcome"><p><strong>Bem-vindo(a) ao Linha de Solução!</strong><br>Este canal foi criado para <strong>esclarecer dúvidas</strong>, <strong>registrar reclamações</strong>, <strong>dar feedbacks</strong> e <strong>consultar seus direitos e benefícios</strong>.<br>As informações são <strong>100% sigilosas</strong> — apenas o setor de <strong>Recursos Humanos</strong> tem acesso às respostas.<br>Sua identidade é <strong>preservada</strong> e todas as respostas permanecem <strong>anônimas</strong>.<br><br><strong>Informações com base na CLT e práticas usuais de mercado.</strong><br><strong>Aviso:</strong> Conteúdo informativo. Pode haver variações por acordo/CC e atualizações legais. Para casos concretos, acione o RH/jurídico.</p></section>
 
   <!-- MAIN MENU -->
   <section class="menu" id="mainMenu">
@@ -207,7 +290,20 @@
     <select id="rh-urg"><option>Não</option><option>Sim</option></select>
     <button id="open-whatsapp">Falar Agora (WhatsApp)</button>
     <button class="small" onclick="backToMenu()">← Voltar</button>
-  </section>
+  
+
+<div class="rh-whatsapp-cta">
+  <a class="whatsapp-btn" target="_blank" rel="noopener" 
+     href="https://wa.me/5514991078126?text=Ol%C3%A1!%20Gostaria%20de%20falar%20com%20o%20RH.">
+    <svg class="whatsapp-icon" viewBox="0 0 32 32" aria-hidden="true">
+      <path fill="#fff" d="M19.11 17.38c-.3-.15-1.77-.87-2.05-.97-.28-.1-.48-.15-.69.15-.2.3-.79.97-.97 1.17-.18.2-.36.22-.66.07-.3-.15-1.28-.47-2.44-1.5-.9-.8-1.5-1.77-1.68-2.07-.18-.3-.02-.47.13-.62.13-.13.3-.36.44-.54.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.69-1.67-.95-2.28-.25-.6-.5-.52-.69-.52h-.59c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.5s1.06 2.9 1.21 3.09c.15.2 2.09 3.19 5.06 4.47.71.31 1.26.5 1.69.64.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.41.25-.7.25-1.29.18-1.41-.07-.12-.25-.2-.55-.35z"/>
+      <path fill="#25D366" d="M26.67 5.35A12.87 12.87 0 0 0 16 1.33c-7.11 0-12.87 5.77-12.87 12.87 0 2.27.6 4.47 1.75 6.42L2.67 30.67 12 28.6c1.87 1.02 3.98 1.56 6.15 1.56 7.11 0 12.87-5.77 12.87-12.87 0-3.43-1.33-6.65-3.77-9zm-10.67 22a10.7 10.7 0 0 1-5.47-1.5l-.39-.23-6.47 1.47 1.38-6.31-.25-.41a10.7 10.7 0 0 1-1.6-5.57c0-5.91 4.81-10.72 10.72-10.72s10.72 4.81 10.72 10.72-4.81 10.72-10.72 10.72z"/>
+    </svg>
+    Falar com o RH pelo WhatsApp
+  </a>
+</div>
+
+</section>
 
   <footer>&copy; 2025 - Linha de Solução | Recursos Humanos Corporativo</footer>
 
@@ -751,5 +847,39 @@
     });
   })();
   </script>
+
+<!-- Botão flutuante WhatsApp (aparece só na Home) -->
+<div class="wa-float" id="waFloat" aria-label="Contato RH via WhatsApp">
+  <a target="_blank" rel="noopener"
+     href="https://wa.me/5514991078126?text=Ol%C3%A1!%20Gostaria%20de%20falar%20com%20o%20RH.">
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <path fill="#fff" d="M19.11 17.38c-.3-.15-1.77-.87-2.05-.97-.28-.1-.48-.15-.69.15-.2.3-.79.97-.97 1.17-.18.2-.36.22-.66.07-.3-.15-1.28-.47-2.44-1.5-.9-.8-1.5-1.77-1.68-2.07-.18-.3-.02-.47.13-.62.13-.13.3-.36.44-.54.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.69-1.67-.95-2.28-.25-.6-.5-.52-.69-.52h-.59c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.5s1.06 2.9 1.21 3.09c.15.2 2.09 3.19 5.06 4.47.71.31 1.26.5 1.69.64.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.41.25-.7.25-1.29.18-1.41-.07-.12-.25-.2-.55-.35z"/>
+      <path fill="#25D366" d="M26.67 5.35A12.87 12.87 0 0 0 16 1.33c-7.11 0-12.87 5.77-12.87 12.87 0 2.27.6 4.47 1.75 6.42L2.67 30.67 12 28.6c1.87 1.02 3.98 1.56 6.15 1.56 7.11 0 12.87-5.77 12.87-12.87 0-3.43-1.33-6.65-3.77-9zm-10.67 22a10.7 10.7 0 0 1-5.47-1.5l-.39-.23-6.47 1.47 1.38-6.31-.25-.41a10.7 10.7 0 0 1-1.6-5.57c0-5.91 4.81-10.72 10.72-10.72s10.72 4.81 10.72 10.72-4.81 10.72-10.72 10.72z"/>
+    </svg>
+    <span>WhatsApp RH</span>
+  </a>
+</div>
+
+
+<script>
+(function(){
+  function show(el){ if(el){ el.style.display='block'; } }
+  function hide(el){ if(el){ el.style.display='none'; } }
+  const btn = document.getElementById('waFloat');
+  if(!btn){ return; }
+  const welcome = document.querySelector('.welcome') || document.querySelector('section.welcome');
+  if(!('IntersectionObserver' in window) || !welcome){
+    // Fallback: se não der p/ observar, mostra na home (assumindo página estática)
+    show(btn); return;
+  }
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){ show(btn); } else { hide(btn); }
+    });
+  }, {threshold: 0.05});
+  obs.observe(welcome);
+})();
+</script>
+
 </body>
 </html>
