@@ -46,6 +46,15 @@
     .modal .card{ max-width:720px; width:92% }
     pre{ white-space:pre-wrap; word-break:break-word; background:rgba(255,255,255,.06); padding:10px; border-radius:8px }
     .hint{ background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.35); padding:10px; border-radius:10px; color:#bbf7d0; margin:10px 0 }
+
+    /* Impressão (PDF via Print) */
+    @media print{
+      body{ background:#fff; color:#000 }
+      header, .toolbar, .footer, #modal{ display:none !important }
+      .card{ box-shadow:none; border:1px solid #ddd; }
+      table{ border-collapse:collapse; border-spacing:0 }
+      th, td{ border:1px solid #ccc; color:#000 }
+    }
   </style>
 </head>
 <body>
@@ -121,9 +130,13 @@
             <button class="ghost pill" id="btnReset">Limpar filtros</button>
           </div>
           <div class="right row">
+            <!-- NOVOS BOTÕES: DOC, PDF e SAIR -->
+            <button class="pill" id="btnExportDoc">Exportar DOC</button>
+            <button class="pill" id="btnExportPdf">Exportar PDF</button>
             <button class="pill" id="btnExport">Exportar JSON</button>
             <button class="pill warn" id="btnReload">Recarregar</button>
             <button class="pill danger" id="btnClear">Apagar Tudo (local)</button>
+            <button class="pill ghost" id="btnLogout" title="Encerrar sessão">Sair</button>
           </div>
         </div>
       </section>
@@ -198,6 +211,17 @@
           return;
         }
         alert('Usuário ou senha inválidos.');
+      }
+
+      function logout(){
+        setAuth(false);
+        // opcional: limpar campos do login
+        const iu = document.getElementById('inUser');
+        const ip = document.getElementById('inPass');
+        if(iu) iu.value = '';
+        if(ip) ip.value = '';
+        hide(panelEl);
+        show(loginEl);
       }
 
       function render(){
@@ -361,6 +385,7 @@
         show(modal);
       }
 
+      /* ====== EXPORTS ====== */
       function exportJSON(){
         const data = applyFilters(loadData());
         try{
@@ -374,6 +399,88 @@
         }catch(e){
           alert('Falha ao exportar. Ver permissões do navegador.');
         }
+      }
+
+      // Gera tabela HTML baseada nos dados filtrados (compartilhado por DOC/PDF)
+      function buildTableHTML(rows){
+        const th = `
+          <tr>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc">Quando</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc">Tipo</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc">Setor/Info</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc">Conteúdo</th>
+            <th style="text-align:left;padding:8px;border:1px solid #ccc">Urgência</th>
+          </tr>`;
+        const td = rows.map(it=>{
+          const tipo = it.type || '-';
+          const d = it.data || {};
+          const setor = (d.setor || d.sector || d.department || '') || (tipo==='agendamento_psicologo' ? (d.day||'') : '');
+          const texto = (d.texto || d.description || d.text || '') || (tipo==='agendamento_psicologo' ? ('Horário: '+(d.time||'')) : '');
+          const urg = (d.urg || d.urgente || '').toString();
+          return `
+            <tr>
+              <td style="padding:8px;border:1px solid #ccc">${formatDate(it.createdAt||'')}</td>
+              <td style="padding:8px;border:1px solid #ccc">${tipo}</td>
+              <td style="padding:8px;border:1px solid #ccc">${setor||'-'}</td>
+              <td style="padding:8px;border:1px solid #ccc">${(texto||'').replace(/</g,'&lt;')}</td>
+              <td style="padding:8px;border:1px solid #ccc">${urg||''}</td>
+            </tr>`;
+        }).join('');
+        return `<table style="width:100%;border-collapse:collapse">${th}${td}</table>`;
+      }
+
+      // Exporta como DOC (Word compatível, offline)
+      function exportDOC(){
+        const data = applyFilters(loadData());
+        const content = `
+          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+          <head><meta charset="UTF-8"><title>Registros — Linha de Solução</title></head>
+          <body>
+            <h2>Registros — Linha de Solução</h2>
+            <p>Exportado em ${formatDate(new Date().toISOString())}</p>
+            ${buildTableHTML(data)}
+          </body></html>`;
+        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'registros-linha-de-solucao.doc';
+        a.click();
+        setTimeout(()=> URL.revokeObjectURL(url), 5000);
+      }
+
+      // Exporta como PDF via janela de impressão (100% cliente, sem libs)
+      function exportPDF(){
+        const data = applyFilters(loadData());
+        const html = `
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <title>Registros — Linha de Solução (PDF)</title>
+              <style>
+                body{ font-family:Arial,Helvetica,sans-serif; color:#000; padding:16px }
+                h2{ margin:0 0 6px 0 }
+                p{ margin:6px 0 16px 0 }
+                table{ width:100%; border-collapse:collapse }
+                th, td{ border:1px solid #ccc; padding:8px; text-align:left; font-size:12px }
+                thead th{ background:#f2f2f2 }
+                @media print{ @page{ margin:16mm } }
+              </style>
+            </head>
+            <body>
+              <h2>Registros — Linha de Solução</h2>
+              <p>Exportado em ${formatDate(new Date().toISOString())}</p>
+              ${buildTableHTML(data)}
+              <script>
+                window.onload = function(){ window.focus(); window.print(); };
+              <\/script>
+            </body>
+          </html>`;
+        const w = window.open('', '_blank');
+        if(!w){ alert('Pop-up bloqueado. Autorize pop-ups para este site.'); return; }
+        w.document.open();
+        w.document.write(html);
+        w.document.close();
       }
 
       function clearAll(){
@@ -393,6 +500,9 @@
         const btnClear = document.getElementById('btnClear');
         const btnReload = document.getElementById('btnReload');
         const btnInject = document.getElementById('btnInject');
+        const btnExportDoc = document.getElementById('btnExportDoc');
+        const btnExportPdf = document.getElementById('btnExportPdf');
+        const btnLogout = document.getElementById('btnLogout');
 
         // fecha modal ao iniciar
         hide(modal);
@@ -421,10 +531,14 @@
           ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
           if(fTipo) fTipo.value=''; if(fUrg) fUrg.value=''; loadAndPaint();
         });
+
         btnExport && btnExport.addEventListener('click', exportJSON);
+        btnExportDoc && btnExportDoc.addEventListener('click', exportDOC);
+        btnExportPdf && btnExportPdf.addEventListener('click', exportPDF);
         btnClear && btnClear.addEventListener('click', clearAll);
         btnReload && btnReload.addEventListener('click', loadAndPaint);
         btnInject && btnInject.addEventListener('click', injectDemo);
+        btnLogout && btnLogout.addEventListener('click', logout);
 
         if(authOk()){ render(); } else { show(loginEl); }
       });
