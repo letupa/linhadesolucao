@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel RH — Linha de Solução (Auth + Realtime)</title>
+<title>Painel RH — Linha de Solução (Realtime, sem login)</title>
 <style>
-  :root{ --gold:#FFD60A; --bg:#0B2A5A; }
-  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#fff;margin:0;padding:24px}
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#0B2A5A;color:#fff;margin:0;padding:24px}
   .wrap{max-width:1100px;margin:0 auto}
   h1{margin:0 0 12px 0;font-size:26px}
   .subtitle{opacity:.9;margin-bottom:20px}
@@ -14,69 +13,54 @@
   .row{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
   select,input,button{border:none;border-radius:10px;padding:10px 12px}
   button{font-weight:700;cursor:pointer}
-  .btn{background:var(--gold);color:#000}
   table{width:100%;border-collapse:collapse;margin-top:10px;background:rgba(0,0,0,.25);border-radius:10px;overflow:hidden}
   th,td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
-  th{background:rgba(255,214,10,.15);color:var(--gold);text-align:left}
+  th{background:rgba(255,214,10,.15);color:#FFD60A;text-align:left}
   tr:hover td{background:rgba(255,255,255,.04)}
-  .pill{display:inline-block;background:rgba(255,214,10,.18);color:var(--gold);padding:2px 8px;border-radius:999px;font-size:.85em}
+  .pill{display:inline-block;background:rgba(255,214,10,.18);color:#FFD60A;padding:2px 8px;border-radius:999px;font-size:.85em}
   .muted{opacity:.85}
-  .auth-box{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .who{font-size:14px;opacity:.9}
-  .hide{display:none}
   #err{display:none;background:#8b0000;padding:10px;border-radius:8px;margin:10px 0}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Painel RH — Linha de Solução</h1>
-  <div class="subtitle">Protegido por login Google. Atualização em tempo real (Firestore).</div>
+  <div class="subtitle">Atualização em tempo real (Firestore). <strong>Sem login</strong>.</div>
 
-  <div id="err">Não foi possível conectar ao Firebase. Verifique as credenciais e as regras do Firestore.</div>
+  <div id="err">Não foi possível conectar ao Firebase. Verifique as credenciais e as <em>Rules</em> do Firestore (libere leitura).</div>
 
-  <div class="card auth-box">
-    <div class="who">
-      <div id="userInfo" class="muted">Você não está autenticado.</div>
-    </div>
-    <div>
-      <button id="btnLogin" class="btn">Entrar com Google</button>
-      <button id="btnLogout" class="hide">Sair</button>
+  <div class="card">
+    <div class="row">
+      <select id="fTipo">
+        <option value="">Tipo (todos)</option>
+        <option value="reclamacao">Reclamações</option>
+        <option value="sugestao">Sugestões</option>
+        <option value="agendamento_psicologo">Agendamentos Psicólogo</option>
+        <option value="contato_rh">Contato RH</option>
+      </select>
+      <input id="fBusca" placeholder="Buscar texto (setor, conteúdo, nome, RG...)">
+      <button id="btnExport">Exportar CSV</button>
     </div>
   </div>
 
-  <div id="app" class="hide">
-    <div class="card">
-      <div class="row">
-        <select id="fTipo">
-          <option value="">Tipo (todos)</option>
-          <option value="reclamacao">Reclamações</option>
-          <option value="sugestao">Sugestões</option>
-          <option value="agendamento_psicologo">Agendamentos Psicólogo</option>
-          <option value="contato_rh">Contato RH</option>
-        </select>
-        <input id="fBusca" placeholder="Buscar texto (setor, conteúdo, nome, RG...)">
-        <button id="btnExport" class="btn">Exportar CSV</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <table id="tbl">
-        <thead>
-          <tr>
-            <th>Data/Hora</th>
-            <th>Tipo</th>
-            <th>Conteúdo</th>
-            <th>Origem</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-      <div class="muted" id="status"></div>
-    </div>
+  <div class="card">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Tipo</th>
+          <th>Conteúdo</th>
+          <th>Origem</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="muted" id="status"></div>
   </div>
 </div>
 
 <script type="module">
+// Firebase config (mesmo do chat)
 const firebaseConfig = {
   apiKey: "AIzaSyBL6ZwoJcEXFENCQUVv3UX7fTkfOUbQ1MA",
   authDomain: "linhadesolucao.firebaseapp.com",
@@ -87,52 +71,19 @@ const firebaseConfig = {
 };
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-let app, auth, db, unsub = null;
+let db = null;
 const el = (id)=>document.getElementById(id);
-const appBox = el('app');
-const userInfo = el('userInfo');
-const btnLogin = el('btnLogin');
-const btnLogout = el('btnLogout');
 const errBox = el('err');
 
 try{
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
 }catch(e){
   console.error('[LS] Erro Firebase', e);
   errBox.style.display = 'block';
 }
-
-const provider = new GoogleAuthProvider();
-// provider.setCustomParameters({ hd: "suaempresa.com" }); // opcional: restringir domínio
-
-btnLogin?.addEventListener('click', async ()=>{
-  try{ await signInWithPopup(auth, provider); }catch(e){ alert('Falha no login: '+e.message); }
-});
-btnLogout?.addEventListener('click', async ()=>{
-  try{ await signOut(auth); }catch(e){ alert('Falha ao sair: '+e.message); }
-});
-
-onAuthStateChanged(auth, (user)=>{
-  if (typeof unsub === 'function'){ unsub(); unsub = null; } // limpa listener anterior
-
-  if(user){
-    btnLogin.classList.add('hide');
-    btnLogout.classList.remove('hide');
-    appBox.classList.remove('hide');
-    userInfo.textContent = `Autenticado como: ${user.displayName || user.email}`;
-    startLive();
-  }else{
-    btnLogin.classList.remove('hide');
-    btnLogout.classList.add('hide');
-    appBox.classList.add('hide');
-    userInfo.textContent = 'Você não está autenticado.';
-  }
-});
 
 const tbody = el('tbody');
 const fTipo = el('fTipo');
@@ -191,17 +142,15 @@ btnExport?.addEventListener('click', ()=>{
   URL.revokeObjectURL(url);
 });
 
-function startLive(){
-  try{
-    const qRef = query(collection(db, "ls_registros"), orderBy("createdAt", "desc"));
-    unsub = onSnapshot(qRef, snap => {
-      cache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-      applyFilters();
-    });
-  }catch(e){
-    console.error('Falha ao iniciar live query', e);
-    errBox.style.display = 'block';
-  }
+try{
+  const qRef = query(collection(db, "ls_registros"), orderBy("createdAt", "desc"));
+  onSnapshot(qRef, snap => {
+    cache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    applyFilters();
+  });
+}catch(e){
+  console.error('Falha ao iniciar live query', e);
+  errBox.style.display = 'block';
 }
 </script>
 </body>
