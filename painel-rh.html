@@ -1,548 +1,151 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel RH — Linha de Solução (Registros) v3</title>
-  <style>
-    :root{ --bg1:#0b1f3a; --bg2:#0b335a; --ac:#FFD60A; --txt:#f7f7f7; --muted:#c9d4e2; }
-    *{ box-sizing:border-box }
-    body{ margin:0; font-family: Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:var(--txt); min-height:100vh; }
-    header{ padding:20px; text-align:center; background:rgba(0,0,0,.25); position:sticky; top:0; z-index:2; }
-    h1{ margin:0; font-size:1.8rem; color:var(--ac) }
-    h2{ margin:6px 0 0; font-weight:500; color:#eaeaea; font-size:0.95rem }
-    .wrap{ max-width:1200px; margin:20px auto; padding:0 16px }
-    .card{ background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:14px; box-shadow:0 6px 18px rgba(0,0,0,.25); }
-    .login{ max-width:420px; margin:48px auto }
-    label{ font-size:.9rem; color:var(--muted) }
-    input, select, textarea{ width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.06); color:#fff; outline:none }
-    input::placeholder, textarea::placeholder{ color:#c9c9c9 }
-    button{ background:var(--ac); color:#111; font-weight:700; border:none; border-radius:10px; padding:10px 14px; cursor:pointer; box-shadow:0 3px 12px rgba(0,0,0,.25); }
-    button:hover{ transform:translateY(-1px) }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
-    .grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px }
-    @media (max-width:960px){ .grid2,.grid3{ grid-template-columns:1fr } }
-    .muted{ color:var(--muted); font-size:.92rem }
-    .toolbar{ display:flex; flex-wrap:wrap; gap:8px; align-items:end; }
-    .pill{ border-radius:999px; padding:8px 12px; font-size:.9rem }
-    table{ width:100%; border-collapse:separate; border-spacing:0 8px; }
-    th, td{ text-align:left; padding:10px 12px; }
-    thead th{ font-size:.85rem; color:#bcd; text-transform:uppercase; letter-spacing:.04em }
-    tbody tr{ background:rgba(0,0,0,.25); border-radius:10px }
-    tbody tr td:first-child{ border-top-left-radius:10px; border-bottom-left-radius:10px }
-    tbody tr td:last-child{ border-top-right-radius:10px; border-bottom-right-radius:10px }
-    .badge{ display:inline-block; padding:2px 8px; border-radius:999px; background:rgba(255,214,10,.18); color:var(--ac); font-size:.8rem; margin-right:6px }
-    .row{ display:flex; gap:8px; align-items:center }
-    .right{ margin-left:auto }
-    .danger{ background:#ef4444; color:#fff }
-    .ok{ background:#22c55e; color:#0b1f0f }
-    .warn{ background:#f59e0b; color:#1f1400 }
-    .ghost{ background:rgba(255,255,255,.12); color:#fff }
-    .tablewrap{ overflow:auto; }
-    .hl{ background:rgba(255,214,10,.25); border-radius:6px; padding:0 3px }
-    .footer{ text-align:center; padding:12px; color:#bcd; font-size:.85rem }
-    .hidden{ display:none !important; }
-    .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.6); z-index:30 }
-    .modal .card{ max-width:720px; width:92% }
-    pre{ white-space:pre-wrap; word-break:break-word; background:rgba(255,255,255,.06); padding:10px; border-radius:8px }
-    .hint{ background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.35); padding:10px; border-radius:10px; color:#bbf7d0; margin:10px 0 }
-
-    /* Impressão (PDF via Print) */
-    @media print{
-      body{ background:#fff; color:#000 }
-      header, .toolbar, .footer, #modal{ display:none !important }
-      .card{ box-shadow:none; border:1px solid #ddd; }
-      table{ border-collapse:collapse; border-spacing:0 }
-      th, td{ border:1px solid #ccc; color:#000 }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel RH — Linha de Solução (Realtime)</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#0B2A5A;color:#fff;margin:0;padding:24px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{margin:0 0 12px 0;font-size:26px}
+  .subtitle{opacity:.9;margin-bottom:20px}
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin:10px 0}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  select,input,button{border:none;border-radius:10px;padding:10px 12px}
+  button{font-weight:700;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:10px;background:rgba(0,0,0,.25);border-radius:10px;overflow:hidden}
+  th,td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+  th{background:rgba(255,214,10,.15);color:#FFD60A;text-align:left}
+  tr:hover td{background:rgba(255,255,255,.04)}
+  .pill{display:inline-block;background:rgba(255,214,10,.18);color:#FFD60A;padding:2px 8px;border-radius:999px;font-size:.85em}
+  .muted{opacity:.85}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Painel RH — Linha de Solução</h1>
-    <h2>Registros do Canal Corporativo de Atendimento ao Colaborador</h2>
-  </header>
+<div class="wrap">
+  <h1>Painel RH — Linha de Solução</h1>
+  <div class="subtitle">Atualização em tempo real (Firestore). Filtre e exporte.</div>
 
-  <main class="wrap">
-    <!-- Login -->
-    <section id="login" class="card login">
-      <h3>Acesso Restrito ao RH</h3>
-      <p class="muted">Use a credencial provisória. Recomenda-se trocar assim que possível.</p>
-      <div style="display:grid; gap:10px; margin-top:10px">
-        <div>
-          <label>Usuário</label>
-          <input id="inUser" type="text" placeholder="ex.: rh_admin">
-        </div>
-        <div>
-          <label>Senha</label>
-          <input id="inPass" type="password" placeholder="••••••••">
-        </div>
-        <div class="row">
-          <button id="btnLogin">Entrar</button>
-          <span class="muted">Padrão: usuário <b>rh</b> / senha <b>admin123</b></span>
-        </div>
-        <div class="hint">Se abrir em outro computador/navegador, pode estar vazio porque os dados ficam salvos localmente (localStorage). Clique em “Dados de teste” para validar a interface.</div>
-        <div class="row">
-          <button id="btnInject" class="ghost">Dados de teste</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Painel -->
-    <section id="panel" class="hidden">
-      <!-- Filtros -->
-      <section class="card" style="margin-bottom:12px">
-        <div class="toolbar">
-          <div style="flex:1">
-            <label>Busca</label>
-            <input id="q" type="text" placeholder="Pesquise por texto, setor, tipo, urgência…">
-          </div>
-          <div>
-            <label>Tipo</label>
-            <select id="fTipo">
-              <option value="">Todos</option>
-              <option value="reclamacao">Reclamação</option>
-              <option value="sugestao">Sugestão</option>
-              <option value="agendamento_psicologo">Agendamento Psicólogo</option>
-            </select>
-          </div>
-          <div>
-            <label>Urgência</label>
-            <select id="fUrg">
-              <option value="">Todas</option>
-              <option>Sim</option>
-              <option>Não</option>
-            </select>
-          </div>
-          <div>
-            <label>Setor</label>
-            <input id="fSetor" type="text" placeholder="ex.: Financeiro">
-          </div>
-          <div>
-            <label>Data (início)</label>
-            <input id="fIni" type="date">
-          </div>
-          <div>
-            <label>Data (fim)</label>
-            <input id="fFim" type="date">
-          </div>
-          <div class="row">
-            <button class="ghost pill" id="btnReset">Limpar filtros</button>
-          </div>
-          <div class="right row">
-            <!-- NOVOS BOTÕES: DOC, PDF e SAIR -->
-            <button class="pill" id="btnExportDoc">Exportar DOC</button>
-            <button class="pill" id="btnExportPdf">Exportar PDF</button>
-            <button class="pill" id="btnExport">Exportar JSON</button>
-            <button class="pill warn" id="btnReload">Recarregar</button>
-            <button class="pill danger" id="btnClear">Apagar Tudo (local)</button>
-            <button class="pill ghost" id="btnLogout" title="Encerrar sessão">Sair</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Tabela -->
-      <section class="card tablewrap">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th>Quando</th>
-              <th>Tipo</th>
-              <th>Setor/Info</th>
-              <th>Conteúdo</th>
-              <th>Urg.</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody">
-            <tr><td colspan="6"><span class="muted">Carregando…</span></td></tr>
-          </tbody>
-        </table>
-      </section>
-    </section>
-  </main>
-
-  <!-- Modal começa sempre oculto com style inline -->
-  <div id="modal" class="modal hidden" style="display:none">
-    <div class="card" id="modalCard">
-      <div class="row">
-        <h3 style="margin:0">Detalhes do Registro</h3>
-        <button id="btnClose" class="right ghost">Fechar</button>
-      </div>
-      <div id="modalBody" style="margin-top:10px"></div>
+  <div class="card">
+    <div class="row">
+      <select id="fTipo">
+        <option value="">Tipo (todos)</option>
+        <option value="reclamacao">Reclamações</option>
+        <option value="sugestao">Sugestões</option>
+        <option value="agendamento_psicologo">Agendamentos Psicólogo</option>
+        <option value="contato_rh">Contato RH</option>
+      </select>
+      <input id="fBusca" placeholder="Buscar texto (setor, conteúdo, nome, RG...)">
+      <button id="btnExport">Exportar CSV</button>
     </div>
   </div>
 
-  <div class="footer">© 2025 — Uso interno do RH. Dados carregados do navegador via localStorage (<code>LS_records_v1</code>).</div>
+  <div class="card">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Tipo</th>
+          <th>Conteúdo</th>
+          <th>Origem</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="muted" id="status"></div>
+  </div>
+</div>
 
-  <script defer>
-    (function(){
-      const KEY = 'LS_records_v1';
-      const AUTHKEY = 'LS_panel_auth';
-      const DEFAULT_USER='rh';
-      const DEFAULT_PASS='admin123';
+<script type="module">
 
-      const $ = sel => document.querySelector(sel);
-      const loginEl = $('#login');
-      const panelEl = $('#panel');
-      const modal = $('#modal');
-      const modalCard = $('#modalCard');
-      const modalBody = $('#modalBody');
+const firebaseConfig = {
+  apiKey: "AIzaSyBL6ZwoJcEXFENCQUVv3UX7fTkfOUbQ1MA",
+  authDomain: "linhadesolucao.firebaseapp.com",
+  projectId: "linhadesolucao",
+  storageBucket: "linhadesolucao.firebasestorage.app",
+  messagingSenderId: "956194724164",
+  appId: "1:956194724164:web:b5248bc45baf453205df11"
+};
 
-      function show(el){ if(el){ el.classList.remove('hidden'); el.style.display=''; } }
-      function hide(el){ if(el){ el.classList.add('hidden'); el.style.display='none'; } }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-      function authOk(){
-        try{ return localStorage.getItem(AUTHKEY) === 'ok'; }catch(e){ return false; }
-      }
-      function setAuth(ok){
-        try{
-          if(ok) localStorage.setItem(AUTHKEY, 'ok');
-          else localStorage.removeItem(AUTHKEY);
-        }catch(e){}
-      }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-      function tryLogin(){
-        const u = (document.getElementById('inUser')||{}).value?.trim?.() || '';
-        const p = (document.getElementById('inPass')||{}).value || '';
-        if((u===DEFAULT_USER || u==='rh_admin') && p===DEFAULT_PASS){
-          setAuth(true);
-          render();
-          return;
-        }
-        alert('Usuário ou senha inválidos.');
-      }
+const tbody = document.getElementById('tbody');
+const fTipo = document.getElementById('fTipo');
+const fBusca = document.getElementById('fBusca');
+const statusEl = document.getElementById('status');
+const btnExport = document.getElementById('btnExport');
 
-      function logout(){
-        setAuth(false);
-        // opcional: limpar campos do login
-        const iu = document.getElementById('inUser');
-        const ip = document.getElementById('inPass');
-        if(iu) iu.value = '';
-        if(ip) ip.value = '';
-        hide(panelEl);
-        show(loginEl);
-      }
+let cache = [];
 
-      function render(){
-        hide(modal); // garante modal fechado
-        hide(loginEl);
-        show(panelEl);
-        loadAndPaint();
-      }
+function tsToLocal(ts){
+  if(!ts) return '-';
+  try{
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString();
+  }catch(e){ return '-'; }
+}
 
-      function loadData(){
-        try{
-          const raw = localStorage.getItem(KEY) || '[]';
-          const arr = JSON.parse(raw);
-          return Array.isArray(arr) ? arr : [];
-        }catch(e){
-          console.warn('Erro lendo storage', e);
-          return [];
-        }
-      }
+function render(rows){
+  tbody.innerHTML = '';
+  rows.forEach(r=>{
+    const tr = document.createElement('tr');
+    const when = tsToLocal(r.createdAt);
+    const tipo = r.type || '-';
+    const origem = r.origin || '-';
+    const conteudo = typeof r.data === 'object' ? JSON.stringify(r.data, null, 2) : String(r.data);
 
-      function injectDemo(){
-        const sample = [
-          { type:'reclamacao', data:{setor:'Operacional', texto:'Ar-condicionado muito frio na sala 3', urg:'Não'}, createdAt:new Date().toISOString() },
-          { type:'sugestao', data:{setor:'Financeiro', texto:'Adicionar opção de adiantamento salarial', urg:'Não'}, createdAt:new Date(Date.now()-86400000).toISOString() },
-          { type:'agendamento_psicologo', data:{day:'Quarta-feira', time:'14:00', urg:'Sim'}, createdAt:new Date(Date.now()-3600000).toISOString() }
-        ];
-        try{
-          localStorage.setItem(KEY, JSON.stringify(sample));
-          alert('Dados de teste inseridos com sucesso.');
-        }catch(e){
-          alert('Falha ao inserir dados de teste (ver permissões).');
-        }
-      }
+    tr.innerHTML = `
+      <td>${when}</td>
+      <td><span class="pill">${tipo}</span></td>
+      <td><pre style="margin:0;white-space:pre-wrap">${conteudo}</pre></td>
+      <td class="muted">${origem}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  statusEl.textContent = `${rows.length} registro(s) exibidos.`;
+}
 
-      function formatDate(iso){
-        if(!iso) return '';
-        try{
-          const d = new Date(iso);
-          const dd = String(d.getDate()).padStart(2,'0');
-          const mm = String(d.getMonth()+1).padStart(2,'0');
-          const yy = d.getFullYear();
-          const hh = String(d.getHours()).padStart(2,'0');
-          const mi = String(d.getMinutes()).padStart(2,'0');
-          return `${dd}/${mm}/${yy} ${hh}:${mi}`;
-        }catch(e){ return iso; }
-      }
+function applyFilters(){
+  const t = (fTipo.value || '').trim().toLowerCase();
+  const q = (fBusca.value || '').trim().toLowerCase();
+  let rows = cache.slice();
+  if(t){
+    rows = rows.filter(r => (r.type||'').toLowerCase() === t);
+  }
+  if(q){
+    rows = rows.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  }
+  render(rows);
+}
 
-      function rowHTML(item, idx){
-        const tipo = item.type || '-';
-        const data = item.data || {};
-        const urg = (data.urg || data.urgente || '').toString();
-        const setor = (data.setor || data.sector || data.department || '') || (tipo==='agendamento_psicologo' ? (data.day||'') : '');
-        const texto = (data.texto || data.description || data.text || '') || (tipo==='agendamento_psicologo' ? ('Horário: '+(data.time||'')) : '');
-        const created = formatDate(item.createdAt);
-        const badge =
-          tipo==='reclamacao' ? '<span class="badge">Reclamação</span>' :
-          tipo==='sugestao' ? '<span class="badge">Sugestão</span>' :
-          tipo==='agendamento_psicologo' ? '<span class="badge">Agendamento</span>' :
-          '<span class="badge">Outro</span>';
-        const urgBadge = urg.toLowerCase()==='sim' ? '<span class="badge" style="background:#fecaca;color:#991b1b">Sim</span>' : (urg ? '<span class="badge">Não</span>' : '');
-        return `<tr data-idx="${idx}">
-          <td>${created}</td>
-          <td>${badge}</td>
-          <td>${setor||'-'}</td>
-          <td>${(texto||'').replace(/</g,'&lt;')}</td>
-          <td>${urgBadge}</td>
-          <td class="row">
-            <button class="ghost" data-act="view">Ver</button>
-            <button class="warn" data-act="del">Excluir</button>
-          </td>
-        </tr>`;
-      }
+fTipo.addEventListener('change', applyFilters);
+fBusca.addEventListener('input', applyFilters);
 
-      function applyFilters(data){
-        const qEl = document.getElementById('q');
-        const fTipoEl = document.getElementById('fTipo');
-        const fUrgEl = document.getElementById('fUrg');
-        const fSetorEl = document.getElementById('fSetor');
-        const fIniEl = document.getElementById('fIni');
-        const fFimEl = document.getElementById('fFim');
+btnExport.addEventListener('click', ()=>{
+  const rows = [['data_hora','tipo','conteudo','origem']];
+  const sel = tbody.querySelectorAll('tr');
+  sel.forEach(tr=>{
+    const tds = tr.querySelectorAll('td');
+    const row = Array.from(tds).map(td => td.innerText.replace(/\\n+/g,' ').replace(/\\s+/g,' ').trim());
+    rows.push(row);
+  });
+  const csv = rows.map(r => r.map(v => `"`+v.replace(/"/g,'""')+`"`).join(',')).join('\\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ls_registros.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
 
-        const q = (qEl?.value || '').toLowerCase();
-        const fTipo = fTipoEl?.value || '';
-        const fUrg = fUrgEl?.value || '';
-        const fSetor = (fSetorEl?.value || '').toLowerCase();
-        const fIni = fIniEl?.value ? new Date(fIniEl.value) : null;
-        const fFim = fFimEl?.value ? new Date(fFimEl.value) : null;
-
-        return data.filter(item => {
-          const d = item.data || {};
-          const texto = (JSON.stringify(item)||'').toLowerCase();
-          if(q && !texto.includes(q)) return false;
-          if(fTipo && item.type!==fTipo) return false;
-          if(fUrg && (String(d.urg||'')!==fUrg)) return false;
-          if(fSetor && !((d.setor||'').toLowerCase().includes(fSetor))) return false;
-          if(fIni || fFim){
-            const t = new Date(item.createdAt||0);
-            if(fIni && t < new Date(fIni.getFullYear(),fIni.getMonth(),fIni.getDate())) return false;
-            if(fFim && t > new Date(fFim.getFullYear(),fFim.getMonth(),fFim.getDate(),23,59,59,999)) return false;
-          }
-          return true;
-        });
-      }
-
-      function paintTable(data){
-        const tb = document.getElementById('tbody');
-        if(!tb) return;
-        if(data.length===0){
-          tb.innerHTML = `<tr><td colspan="6"><span class="muted">Nenhum registro encontrado. Se você está testando em outro computador, insira “Dados de teste” ou colete dados no site principal.</span></td></tr>`;
-          return;
-        }
-        tb.innerHTML = data.map((it, i)=> rowHTML(it, i)).join('');
-      }
-
-      function loadAndPaint(){
-        const data = loadData();
-        const filtered = applyFilters(data);
-        paintTable(filtered);
-        bindRowActions(data);
-      }
-
-      function bindRowActions(data){
-        const tbody = document.getElementById('tbody');
-        if(!tbody) return;
-        tbody.onclick = (e)=>{
-          const btn = e.target.closest('button[data-act]'); if(!btn) return;
-          const tr = e.target.closest('tr[data-idx]'); if(!tr) return;
-          const idx = Number(tr.getAttribute('data-idx'));
-          const act = btn.getAttribute('data-act');
-          if(act==='view'){
-            openModal(data[idx]);
-          }else if(act==='del'){
-            if(confirm('Excluir este registro? Essa ação não pode ser desfeita.')){
-              const allRaw = localStorage.getItem(KEY) || '[]';
-              let all = [];
-              try{ all = JSON.parse(allRaw) }catch(e){ all = [] }
-              const target = data[idx];
-              const stay = all.filter(x => !(x.createdAt === target.createdAt && x.type === target.type && JSON.stringify(x.data)===JSON.stringify(target.data)));
-              localStorage.setItem(KEY, JSON.stringify(stay));
-              loadAndPaint();
-            }
-          }
-        };
-      }
-
-      function openModal(item){
-        modalBody.innerHTML = `
-          <div class="grid2">
-            <div class="card">
-              <strong>Tipo</strong><br>${item?.type||'-'}
-            </div>
-            <div class="card">
-              <strong>Criado em</strong><br>${formatDate(item?.createdAt)}
-            </div>
-          </div>
-          <div class="card" style="margin-top:10px">
-            <strong>Dados</strong>
-            <pre>${(item && item.data) ? JSON.stringify(item.data, null, 2) : '{}'}</pre>
-          </div>
-        `;
-        show(modal);
-      }
-
-      /* ====== EXPORTS ====== */
-      function exportJSON(){
-        const data = applyFilters(loadData());
-        try{
-          const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'registros-linha-de-solucao.json';
-          a.click();
-          setTimeout(()=> URL.revokeObjectURL(url), 5000);
-        }catch(e){
-          alert('Falha ao exportar. Ver permissões do navegador.');
-        }
-      }
-
-      // Gera tabela HTML baseada nos dados filtrados (compartilhado por DOC/PDF)
-      function buildTableHTML(rows){
-        const th = `
-          <tr>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc">Quando</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc">Tipo</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc">Setor/Info</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc">Conteúdo</th>
-            <th style="text-align:left;padding:8px;border:1px solid #ccc">Urgência</th>
-          </tr>`;
-        const td = rows.map(it=>{
-          const tipo = it.type || '-';
-          const d = it.data || {};
-          const setor = (d.setor || d.sector || d.department || '') || (tipo==='agendamento_psicologo' ? (d.day||'') : '');
-          const texto = (d.texto || d.description || d.text || '') || (tipo==='agendamento_psicologo' ? ('Horário: '+(d.time||'')) : '');
-          const urg = (d.urg || d.urgente || '').toString();
-          return `
-            <tr>
-              <td style="padding:8px;border:1px solid #ccc">${formatDate(it.createdAt||'')}</td>
-              <td style="padding:8px;border:1px solid #ccc">${tipo}</td>
-              <td style="padding:8px;border:1px solid #ccc">${setor||'-'}</td>
-              <td style="padding:8px;border:1px solid #ccc">${(texto||'').replace(/</g,'&lt;')}</td>
-              <td style="padding:8px;border:1px solid #ccc">${urg||''}</td>
-            </tr>`;
-        }).join('');
-        return `<table style="width:100%;border-collapse:collapse">${th}${td}</table>`;
-      }
-
-      // Exporta como DOC (Word compatível, offline)
-      function exportDOC(){
-        const data = applyFilters(loadData());
-        const content = `
-          <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-          <head><meta charset="UTF-8"><title>Registros — Linha de Solução</title></head>
-          <body>
-            <h2>Registros — Linha de Solução</h2>
-            <p>Exportado em ${formatDate(new Date().toISOString())}</p>
-            ${buildTableHTML(data)}
-          </body></html>`;
-        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'registros-linha-de-solucao.doc';
-        a.click();
-        setTimeout(()=> URL.revokeObjectURL(url), 5000);
-      }
-
-      // Exporta como PDF via janela de impressão (100% cliente, sem libs)
-      function exportPDF(){
-        const data = applyFilters(loadData());
-        const html = `
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <title>Registros — Linha de Solução (PDF)</title>
-              <style>
-                body{ font-family:Arial,Helvetica,sans-serif; color:#000; padding:16px }
-                h2{ margin:0 0 6px 0 }
-                p{ margin:6px 0 16px 0 }
-                table{ width:100%; border-collapse:collapse }
-                th, td{ border:1px solid #ccc; padding:8px; text-align:left; font-size:12px }
-                thead th{ background:#f2f2f2 }
-                @media print{ @page{ margin:16mm } }
-              </style>
-            </head>
-            <body>
-              <h2>Registros — Linha de Solução</h2>
-              <p>Exportado em ${formatDate(new Date().toISOString())}</p>
-              ${buildTableHTML(data)}
-              <script>
-                window.onload = function(){ window.focus(); window.print(); };
-              <\/script>
-            </body>
-          </html>`;
-        const w = window.open('', '_blank');
-        if(!w){ alert('Pop-up bloqueado. Autorize pop-ups para este site.'); return; }
-        w.document.open();
-        w.document.write(html);
-        w.document.close();
-      }
-
-      function clearAll(){
-        if(!confirm('Tem certeza que deseja apagar TODOS os registros locais?')) return;
-        try{
-          localStorage.removeItem(KEY);
-          loadAndPaint();
-        }catch(e){}
-      }
-
-      // Bind após DOM pronto
-      window.addEventListener('DOMContentLoaded', ()=>{
-        const btnLogin = document.getElementById('btnLogin');
-        const btnClose = document.getElementById('btnClose');
-        const btnReset = document.getElementById('btnReset');
-        const btnExport = document.getElementById('btnExport');
-        const btnClear = document.getElementById('btnClear');
-        const btnReload = document.getElementById('btnReload');
-        const btnInject = document.getElementById('btnInject');
-        const btnExportDoc = document.getElementById('btnExportDoc');
-        const btnExportPdf = document.getElementById('btnExportPdf');
-        const btnLogout = document.getElementById('btnLogout');
-
-        // fecha modal ao iniciar
-        hide(modal);
-
-        btnLogin && btnLogin.addEventListener('click', tryLogin);
-        btnClose && btnClose.addEventListener('click', ()=> hide(modal));
-        // fechar clicando fora do card
-        modal && modal.addEventListener('click', (e)=>{
-          if(e.target === modal) hide(modal);
-        });
-        // fechar via ESC
-        document.addEventListener('keydown', (e)=>{
-          if(e.key === 'Escape') hide(modal);
-        });
-
-        ['q','fSetor','fIni','fFim'].forEach(id=>{
-          const el = document.getElementById(id);
-          el && el.addEventListener('input', loadAndPaint);
-        });
-        const fTipo = document.getElementById('fTipo');
-        const fUrg = document.getElementById('fUrg');
-        fTipo && fTipo.addEventListener('change', loadAndPaint);
-        fUrg && fUrg.addEventListener('change', loadAndPaint);
-        btnReset && btnReset.addEventListener('click', ()=>{
-          const ids = ['q','fSetor','fIni','fFim'];
-          ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-          if(fTipo) fTipo.value=''; if(fUrg) fUrg.value=''; loadAndPaint();
-        });
-
-        btnExport && btnExport.addEventListener('click', exportJSON);
-        btnExportDoc && btnExportDoc.addEventListener('click', exportDOC);
-        btnExportPdf && btnExportPdf.addEventListener('click', exportPDF);
-        btnClear && btnClear.addEventListener('click', clearAll);
-        btnReload && btnReload.addEventListener('click', loadAndPaint);
-        btnInject && btnInject.addEventListener('click', injectDemo);
-        btnLogout && btnLogout.addEventListener('click', logout);
-
-        if(authOk()){ render(); } else { show(loginEl); }
-      });
-    })();
-  </script>
+const qRef = query(collection(db, "ls_registros"), orderBy("createdAt", "desc"));
+onSnapshot(qRef, snap => {
+  cache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  applyFilters();
+});
+</script>
 </body>
 </html>
