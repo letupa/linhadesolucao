@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat - Linha de Solução (Supabase)</title>
+</head>
+<body>
+<h2>Chat Linha de Solução</h2>
+<p>Envie Reclamações, Sugestões ou marque Psicólogo — integrado ao Supabase.</p>
+
+<input id="rec-setor" placeholder="Setor"><br>
+<textarea id="rec-text" placeholder="Descreva sua reclamação"></textarea><br>
+<button id="send-rec-btn">Enviar Reclamação</button>
+
+<hr>
+
+<input id="sug-setor" placeholder="Setor"><br>
+<textarea id="sug-text" placeholder="Sua sugestão"></textarea><br>
+<button id="send-sug-btn">Enviar Sugestão</button>
+
+<hr>
+
+<input id="psy-name" placeholder="Nome completo"><br>
+<input id="psy-rg" placeholder="RG"><br>
+<input id="psy-day" placeholder="Dia desejado"><br>
+<input id="psy-time" placeholder="Horário"><br>
+<button id="book-psy-btn">Agendar Psicólogo</button>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient(
+  "https://pvguhmrimutnflbvdays.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2Z3VobXJpbXV0bmZsYnZkYXlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMzUxNDQsImV4cCI6MjA3NjgxMTE0NH0.HR1kOsi0oRPbDQNpO_P2ieIMP46UP5zsI8GIvindKfU"
+);
+
+function saveLocal(type, data) {
+  try {
+    const key = "LS_records_v1";
+    const all = JSON.parse(localStorage.getItem(key) || "[]");
+    all.push({ type, data, created_at: new Date().toISOString(), origin: location.href, ua: navigator.userAgent });
+    localStorage.setItem(key, JSON.stringify(all));
+  } catch (e) {
+    console.warn("fallback local falhou", e);
+  }
+}
+
+window.saveRecord = async function saveRecord(type, data) {
+  try {
+    const payload = { type, data, origin: location.href, ua: navigator.userAgent };
+    const { error } = await supabase.from("ls_registros").insert([payload]);
+    if (error) throw error;
+    alert("Registro enviado com sucesso!");
+  } catch (err) {
+    console.warn("Supabase indisponível. Salvando local.", err);
+    saveLocal(type, data);
+  }
+};
+
+const byId = (id) => document.getElementById(id);
+const val = (id) => (byId(id)?.value || "").trim();
+
+document.addEventListener("DOMContentLoaded", () => {
+  byId("send-rec-btn")?.addEventListener("click", () => {
+    window.saveRecord("reclamacao", { setor: val("rec-setor"), texto: val("rec-text") });
+  });
+
+  byId("send-sug-btn")?.addEventListener("click", () => {
+    window.saveRecord("sugestao", { setor: val("sug-setor"), texto: val("sug-text") });
+  });
+
+  byId("book-psy-btn")?.addEventListener("click", () => {
+    window.saveRecord("agendamento_psicologo", { name: val("psy-name"), rg: val("psy-rg"), day: val("psy-day"), time: val("psy-time") });
+  });
+});
+</script>
+</body>
+</html>
