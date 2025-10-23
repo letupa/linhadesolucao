@@ -846,69 +846,7 @@ button:hover::after{ left:120%; top:-40%; }
     window.addEventListener('DOMContentLoaded', function(){
       showSection('mainMenu');
 
-      function saveRecord(type, data){
-        try{
-          const key='LS_records_v1';
-          const all=JSON.parse(localStorage.getItem(key)||'[]');
-          all.push({ type, data, createdAt: new Date().toISOString() });
-          localStorage.setItem(key, JSON.stringify(all));
-        }catch(e){ console.warn('Falha ao salvar', e); }
-      }
-      const recBtn=document.getElementById('send-rec-btn');
-      if(recBtn) recBtn.addEventListener('click', function(){
-        const setor=(document.getElementById('rec-setor')||{}).value||'';
-        const texto=((document.getElementById('rec-text')||{}).value||'').trim();
-        const urg=(document.getElementById('rec-urg')||{}).value||'Não';
-        if(!setor) return alert('Selecione um setor');
-        if(!texto) return alert('Descreva a reclamação');
-        saveRecord('reclamacao',{setor,texto,urg});
-        const res=document.getElementById('rec-result'); if(res) res.innerHTML='<div class="success">Reclamação enviada com sucesso.</div>';
-        const t=document.getElementById('rec-text'); if(t) t.value='';
-      });
-      const sugBtn=document.getElementById('send-sug-btn');
-      if(sugBtn) sugBtn.addEventListener('click', function(){
-        const setor=(document.getElementById('sug-setor')||{}).value||'';
-        const texto=((document.getElementById('sug-text')||{}).value||'').trim();
-        const urg=(document.getElementById('sug-urg')||{}).value||'Não';
-        if(!setor) return alert('Selecione um setor');
-        if(!texto) return alert('Descreva a sugestão');
-        saveRecord('sugestao',{setor,texto,urg});
-        const res=document.getElementById('sug-result'); if(res) res.innerHTML='<div class="success">Sugestão enviada com sucesso.</div>';
-        const t=document.getElementById('sug-text'); if(t) t.value='';
-      });
-      const bookBtn=document.getElementById('book-psy-btn');
-      if(bookBtn) bookBtn.addEventListener('click', function(){
-        const name=(document.getElementById('psy-name')||{}).value||'';
-        const rg=(document.getElementById('psy-rg')||{}).value||'';
-        const day=(document.getElementById('psy-day')||{}).value||'';
-        const time=(document.getElementById('psy-time')||{}).value||'';
-        if(!name || !rg) return alert('Por favor, preencha seu nome e RG.');
-        saveRecord('agendamento_psicologo',{name,rg,day,time});
-        const res=document.getElementById('psy-result'); if(res) res.innerHTML='<div class="success">Horário reservado. O RH será notificado.</div>';
-      });
-      const waBtn=document.getElementById('open-whatsapp');
-      if(waBtn) waBtn.addEventListener('click', function(){
-        const phone=((document.getElementById('rh-phone')||{}).value||'').trim();
-        const urg=(document.getElementById('rh-urg')||{}).value||'Não';
-        if(!phone) return alert('Informe seu número de telefone com DDD');
-        const text=encodeURIComponent('Olá RH, preciso de atendimento. Número informado: '+phone+'. Urgente: '+urg+'.');
-        const RH_WHATSAPP_NUMBER='+5511999999999';
-        const url='https://api.whatsapp.com/send?phone='+RH_WHATSAPP_NUMBER.replace(/[^0-9+]/g,'')+'&text='+text;
-        window.open(url,'_blank');
-      });
-
-      attachSearch();
-      renderGlossario();
-      const btnGloss=document.getElementById('btnGlossarioTop');
-      if(btnGloss){
-        btnGloss.addEventListener('click', ()=>{
-          const box=document.getElementById('glossarioBox');
-          if(!box) return;
-          box.open = true;
-          box.scrollIntoView({behavior:'smooth', block:'start'});
-        });
-      }
-    });
+      // saveRecord antigo removido para Firestore
   })();
   </script>
 
@@ -1070,5 +1008,49 @@ button:hover::after{ left:120%; top:-40%; }
   setTimeout(()=> toast('Painel RH: use Ctrl + Shift + R'), 800);
 })();
 </script>
+
+<script type="module">
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBL6ZwoJcEXFENCQUVv3UX7fTkfOUbQ1MA",
+  authDomain: "linhadesolucao.firebaseapp.com",
+  projectId: "linhadesolucao",
+  storageBucket: "linhadesolucao.firebasestorage.app",
+  messagingSenderId: "956194724164",
+  appId: "1:956194724164:web:b5248bc45baf453205df11"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function saveLocal(type, data){
+  try{
+    const key='LS_records_v1';
+    const all=JSON.parse(localStorage.getItem(key)||'[]');
+    all.push({ type, data, createdAt: new Date().toISOString(), origin: 'local' });
+    localStorage.setItem(key, JSON.stringify(all));
+  }catch(e){ console.warn('Falha ao salvar local', e); }
+}
+
+window.saveRecord = async function saveRecord(type, data){
+  try{
+    const payload = {
+      type,
+      data,
+      createdAt: serverTimestamp(),
+      origin: (typeof location!=='undefined' ? location.href : 'unknown'),
+      ua: (typeof navigator!=='undefined' ? navigator.userAgent : 'node')
+    };
+    await addDoc(collection(db, "ls_registros"), payload);
+  }catch(err){
+    console.warn('Falha Firestore, salvando local...', err);
+    saveLocal(type, data);
+  }
+};
+</script>
+
 </body>
 </html>
