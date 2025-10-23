@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel RH — Linha de Solução (Realtime)</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:#0B2A5A;color:#fff;margin:0;padding:24px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{margin:0 0 12px 0;font-size:26px}
+  .subtitle{opacity:.9;margin-bottom:20px}
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;margin:10px 0}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  select,input,button{border:none;border-radius:10px;padding:10px 12px}
+  button{font-weight:700;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:10px;background:rgba(0,0,0,.25);border-radius:10px;overflow:hidden}
+  th,td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+  th{background:rgba(255,214,10,.15);color:#FFD60A;text-align:left}
+  tr:hover td{background:rgba(255,255,255,.04)}
+  .pill{display:inline-block;background:rgba(255,214,10,.18);color:#FFD60A;padding:2px 8px;border-radius:999px;font-size:.85em}
+  .muted{opacity:.85}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Painel RH — Linha de Solução</h1>
+  <div class="subtitle">Atualização em tempo real (Firestore). Filtre e exporte.</div>
+
+  <div class="card">
+    <div class="row">
+      <select id="fTipo">
+        <option value="">Tipo (todos)</option>
+        <option value="reclamacao">Reclamações</option>
+        <option value="sugestao">Sugestões</option>
+        <option value="agendamento_psicologo">Agendamentos Psicólogo</option>
+        <option value="contato_rh">Contato RH</option>
+      </select>
+      <input id="fBusca" placeholder="Buscar texto (setor, conteúdo, nome, RG...)">
+      <button id="btnExport">Exportar CSV</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Tipo</th>
+          <th>Conteúdo</th>
+          <th>Origem</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="muted" id="status"></div>
+  </div>
+</div>
+
+<script type="module">
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBL6ZwoJcEXFENCQUVv3UX7fTkfOUbQ1MA",
+  authDomain: "linhadesolucao.firebaseapp.com",
+  projectId: "linhadesolucao",
+  storageBucket: "linhadesolucao.firebasestorage.app",
+  messagingSenderId: "956194724164",
+  appId: "1:956194724164:web:b5248bc45baf453205df11"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const tbody = document.getElementById('tbody');
+const fTipo = document.getElementById('fTipo');
+const fBusca = document.getElementById('fBusca');
+const statusEl = document.getElementById('status');
+const btnExport = document.getElementById('btnExport');
+
+let cache = [];
+
+function tsToLocal(ts){
+  if(!ts) return '-';
+  try{
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString();
+  }catch(e){ return '-'; }
+}
+
+function render(rows){
+  tbody.innerHTML = '';
+  rows.forEach(r=>{
+    const tr = document.createElement('tr');
+    const when = tsToLocal(r.createdAt);
+    const tipo = r.type || '-';
+    const origem = r.origin || '-';
+    const conteudo = typeof r.data === 'object' ? JSON.stringify(r.data, null, 2) : String(r.data);
+
+    tr.innerHTML = `
+      <td>${when}</td>
+      <td><span class="pill">${tipo}</span></td>
+      <td><pre style="margin:0;white-space:pre-wrap">${conteudo}</pre></td>
+      <td class="muted">${origem}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  statusEl.textContent = `${rows.length} registro(s) exibidos.`;
+}
+
+function applyFilters(){
+  const t = (fTipo.value || '').trim().toLowerCase();
+  const q = (fBusca.value || '').trim().toLowerCase();
+  let rows = cache.slice();
+  if(t){
+    rows = rows.filter(r => (r.type||'').toLowerCase() === t);
+  }
+  if(q){
+    rows = rows.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  }
+  render(rows);
+}
+
+fTipo.addEventListener('change', applyFilters);
+fBusca.addEventListener('input', applyFilters);
+
+btnExport.addEventListener('click', ()=>{
+  const rows = [['data_hora','tipo','conteudo','origem']];
+  const sel = tbody.querySelectorAll('tr');
+  sel.forEach(tr=>{
+    const tds = tr.querySelectorAll('td');
+    const row = Array.from(tds).map(td => td.innerText.replace(/\\n+/g,' ').replace(/\\s+/g,' ').trim());
+    rows.push(row);
+  });
+  const csv = rows.map(r => r.map(v => `"`+v.replace(/"/g,'""')+`"`).join(',')).join('\\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ls_registros.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+const qRef = query(collection(db, "ls_registros"), orderBy("createdAt", "desc"));
+onSnapshot(qRef, snap => {
+  cache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  applyFilters();
+});
+</script>
+</body>
+</html>
