@@ -1,6 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<style>
+/* === v5 IMPACT Enhancements === */
+/* Logo pulse glow */
+.logo-card{
+  animation: logoPulse 4.5s ease-in-out infinite;
+}
+@keyframes logoPulse{
+  0%,100%{ box-shadow: 0 0 18px rgba(255,214,10,.45),0 0 34px rgba(255,214,10,.25); }
+  50%{    box-shadow: 0 0 24px rgba(255,214,10,.70),0 0 56px rgba(255,214,10,.35); }
+}
+
+/* Buttons sheen effect */
+button{ position:relative; overflow:hidden; }
+button::after{
+  content:""; position:absolute; top:-120%; left:-30%;
+  width:60%; height:340%; transform:rotate(25deg);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.45) 50%, rgba(255,255,255,0) 100%);
+  transition: transform .45s ease, left .45s ease, top .45s ease;
+}
+button:hover::after{ left:120%; top:-40%; }
+
+/* Success micro-anim */
+.success{ animation: popIn .35s ease-out; }
+@keyframes popIn{ from{ transform:scale(.97); opacity:.2 } to{ transform:scale(1); opacity:1 } }
+
+/* Admin panel (RH) */
+.rh-panel-overlay{ position:fixed; inset:0; background: rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:99999; }
+.rh-panel{ width:min(100%, 920px); background:#0C1B2E; color:#EAF2FF; border-radius:16px; box-shadow: 0 20px 60px rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.1); }
+.rh-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08); }
+.rh-head h3{ margin:0; font-size:18px; color:#FFD60A }
+.rh-body{ padding:12px 16px; max-height:66vh; overflow:auto; }
+.rh-controls{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.rh-controls input, .rh-controls select{ padding:8px 10px; border-radius:10px; border:none; }
+.rh-table{ width:100%; border-collapse: collapse; }
+.rh-table th, .rh-table td{ padding:10px; border-bottom:1px solid rgba(255,255,255,.06); text-align:left; font-size:14px; }
+.rh-badges{ display:flex; gap:6px; flex-wrap:wrap }
+.badge{ background: rgba(255,214,10,.14); color:#FFD60A; border-radius:999px; padding:2px 8px; font-size:12px; }
+.rh-foot{ display:flex; justify-content:flex-end; gap:8px; padding:12px 16px; border-top:1px solid rgba(255,255,255,.08); }
+.rh-btn{ background:#FFD60A; color:#000; font-weight:700; border:none; border-radius:10px; padding:10px 12px; cursor:pointer }
+
+/* Toast */
+.toast{ position:fixed; right:16px; bottom:16px; background:#0C1B2E; color:#EAF2FF; border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:10px 14px; z-index:9999; box-shadow:0 12px 30px rgba(0,0,0,.4); display:none }
+.toast.show{ display:block; animation: fadeSlide .3s ease-out }
+@keyframes fadeSlide{ from{ opacity:0; transform: translateY(8px)} to{ opacity:1; transform: translateY(0)} }
+
+/* Dark mode tuning */
+@media (prefers-color-scheme: dark){
+  .menu{ background: rgba(0,0,0,.18); }
+  .welcome{ background: rgba(255,255,255,.06); }
+}
+
+</style>
+<style>
+.logo-wrap{width:100%;display:flex;justify-content:center;margin:0 0 16px;}
+.logo-card{display:flex;align-items:center;gap:16px;background:#0C1B2E;padding:18px 22px;border-radius:20px;border:2px solid #FFD60A;box-shadow:0 0 20px #FFD60A,0 0 42px rgba(255,214,10,.38);}
+.logo-icon{width:70px;height:70px;flex:0 0 auto;}
+.logo-title{margin:0;color:#FFD60A;font-size:28px;font-weight:800;letter-spacing:.2px;}
+.logo-sub{margin:2px 0 0;color:#EAF0FF;font-size:14px;}
+</style>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Linha de Solução — v4 TURBO+</title>
@@ -72,10 +132,25 @@
 </style>
 </head>
 <body>
-  <header>
-    
-    <h2>Canal Corporativo de Atendimento ao Colaborador</h2>
-  </header>
+
+  <!-- NOVA LOGO -->
+  <div class="logo-wrap">
+    <div class="logo-card" role="img" aria-label="Linha de Solução — Seu Problema. Nossa Solução.">
+      <svg class="logo-icon" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M60 20h20a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10h-6l-6 10-2-10h-6a10 10 0 0 1-10-10V30a10 10 0 0 1 10-10z" fill="#FFD60A"/>
+        <path d="M18 28h40a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H40l-8 12 2-12H18a10 10 0 0 1-10-10V38a10 10 0 0 1 10-10z" fill="#11A8A6"/>
+        <path d="M28 49l9 9 20-20" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M32 68c16-16 28-24 46-26" fill="none" stroke="#FFD60A" stroke-width="8" stroke-linecap="round"/>
+        <path d="M78 40l-5 2 6 2" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1 class="logo-title">Linha de Solução</h1>
+        <div class="logo-sub">Seu Problema. Nossa Solução.</div>
+      </div>
+    </div>
+  </div>
+
+
 
   
 <!-- HERO LOGO (animado) -->
@@ -120,28 +195,7 @@
   @keyframes bubbleIn { from{ transform:scale(.85); opacity:0 } to{ transform:scale(1); opacity:1 } }
   @keyframes draw { to{ stroke-dashoffset: 0 } }
 </style>
-<section class="hero-logo" aria-label="Logotipo Linha de Solução">
-  <div class="hero-wrap">
-    <div class="hero-logo">
-      <!-- SVG do balão + check (cores do branding) -->
-      <svg viewBox="0 0 100 100" role="img" aria-label="Ícone de diálogo com check">
-        <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#FFD60A" flood-opacity=".55"/>
-          </filter>
-        </defs>
-        <!-- Balão -->
-        <path class="bubble" d="M18 20 h52 a10 10 0 0 1 10 10 v28 a10 10 0 0 1-10 10 H40 L26 82 28 68 H18 a10 10 0 0 1-10-10 V30 a10 10 0 0 1 10-10z" fill="#1262d5"/>
-        <!-- Check animado -->
-        <path class="check" d="M32 48 L45 60 L70 35" fill="none" stroke="#FFD60A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
-      </svg>
-    </div>
-    <div style="text-align:center">
-      <h1 class="hero-title">Linha de Solução</h1>
-      
-    </div>
-  </div>
-</section>
+
 <!-- /HERO LOGO -->
 
 <section class="welcome"><p><strong>Bem-vindo(a) ao Linha de Solução!</strong><br>Este canal foi criado para <strong>esclarecer dúvidas</strong>, <strong>registrar reclamações</strong>, <strong>dar feedbacks</strong> e <strong>consultar seus direitos e benefícios</strong>.<br>As informações são <strong>100% sigilosas</strong> — apenas o setor de <strong>Recursos Humanos</strong> tem acesso às respostas.<br>Sua identidade é <strong>preservada</strong> e todas as respostas permanecem <strong>anônimas</strong>.<br><br><strong>Informações com base na CLT e práticas usuais de mercado.</strong><br><strong>Aviso:</strong> Conteúdo informativo. Pode haver variações por acordo/CC e atualizações legais. Para casos concretos, acione o RH/jurídico.</p></section>
@@ -254,6 +308,13 @@
   <section id="psicologos" class="menu hidden">
     <h3>Psicólogos</h3>
     <p class="muted">Agende um horário com o psicólogo da empresa (Segunda a Sexta).</p>
+
+    <label for="psy-name">Nome do Colaborador</label>
+    <input id="psy-name" type="text" placeholder="Digite seu nome completo">
+
+    <label for="psy-rg">RG</label>
+    <input id="psy-rg" type="text" placeholder="Digite seu RG">
+
     <label for="psy-day">Dia</label>
     <select id="psy-day">
       <option>Segunda-feira</option>
@@ -509,7 +570,7 @@
         html:`<div class="result-card">
           <h4>Intervalo Intrajornada</h4>
           <ul>
-            <li><strong>Jornadas &gt; 6h:</strong> intervalo para refeição/descanso (redução só por acordo válido).</li>
+            <li><strong>Jornadas > 6h:</strong> intervalo para refeição/descanso (redução só por acordo válido).</li>
             <li><strong>Entre 4h e 6h:</strong> intervalo menor (prática: 15min).</li>
           </ul>
           <div class="ver-tambem"></div>
@@ -817,9 +878,12 @@
       });
       const bookBtn=document.getElementById('book-psy-btn');
       if(bookBtn) bookBtn.addEventListener('click', function(){
+        const name=(document.getElementById('psy-name')||{}).value||'';
+        const rg=(document.getElementById('psy-rg')||{}).value||'';
         const day=(document.getElementById('psy-day')||{}).value||'';
         const time=(document.getElementById('psy-time')||{}).value||'';
-        saveRecord('agendamento_psicologo',{day,time});
+        if(!name || !rg) return alert('Por favor, preencha seu nome e RG.');
+        saveRecord('agendamento_psicologo',{name,rg,day,time});
         const res=document.getElementById('psy-result'); if(res) res.innerHTML='<div class="success">Horário reservado. O RH será notificado.</div>';
       });
       const waBtn=document.getElementById('open-whatsapp');
@@ -881,5 +945,130 @@
 })();
 </script>
 
+
+<!-- RH Admin Panel (Ctrl+Shift+R) -->
+<div class="rh-panel-overlay" id="rhPanel">
+  <div class="rh-panel">
+    <div class="rh-head">
+      <h3>Painel RH — Registros</h3>
+      <div class="rh-badges"><span class="badge" id="badgeTotal">0 registros</span></div>
+      <button class="rh-btn" id="btnCloseRH">Fechar</button>
+    </div>
+    <div class="rh-body">
+      <div class="rh-controls">
+        <select id="fType">
+          <option value="">Tipo (todos)</option>
+          <option value="reclamacao">Reclamação</option>
+          <option value="sugestao">Sugestão</option>
+          <option value="agendamento_psicologo">Agendamento Psicólogo</option>
+        </select>
+        <input id="fText" type="text" placeholder="Busca rápida... (setor, texto, nome)"/>
+      </div>
+      <table class="rh-table" id="rhTable">
+        <thead><tr><th>Tipo</th><th>Dados</th><th>Criado em</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="rh-foot">
+      <button class="rh-btn" id="btnExport">Exportar CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="appToast">Atalho: Painel RH habilitado (Ctrl+Shift+R)</div>
+
+
+<script>
+/* === v5 IMPACT Scripts === */
+(function(){
+  // Taglines dinâmicas
+  const frases = [
+    "Transformamos problemas em soluções reais.",
+    "Do desafio ao resultado.",
+    "Analisamos rápido. Resolvemos certo.",
+    "Sua dúvida, nossa execução.",
+    "Soluções que cabem na prática."
+  ];
+  const sub = document.querySelector('.logo-sub');
+  if(sub){
+    let i = 0;
+    setInterval(()=>{
+      i = (i+1) % frases.length;
+      sub.textContent = frases[i];
+    }, 6000);
+  }
+
+  // Toast helper
+  function toast(msg, ms=2200){
+    const t=document.getElementById('appToast'); if(!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), ms);
+  }
+  window._toast = toast;
+
+  // Painel RH (Ctrl+Shift+R)
+  const overlay = document.getElementById('rhPanel');
+  function openRH(){ if(overlay){ overlay.style.display='flex'; renderRH(); } }
+  function closeRH(){ if(overlay){ overlay.style.display='none'; } }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.ctrlKey && e.shiftKey && (e.key==='R' || e.key==='r')){ e.preventDefault(); openRH(); }
+    if(e.key==='Escape'){ closeRH(); }
+  });
+  const btnClose = document.getElementById('btnCloseRH'); if(btnClose) btnClose.addEventListener('click', closeRH);
+
+  // Render RH table
+  function getAll(){
+    try{ return JSON.parse(localStorage.getItem('LS_records_v1')||'[]'); }catch(e){ return []; }
+  }
+  function rowData(obj){
+    const type = obj.type;
+    const d = obj.data || {};
+    if(type==='reclamacao') return `Setor: ${d.setor||'-'} | Urgente: ${d.urg||'Não'} | "${(d.texto||'').slice(0,140)}"`;
+    if(type==='sugestao')  return `Setor: ${d.setor||'-'} | Urgente: ${d.urg||'Não'} | "${(d.texto||'').slice(0,140)}"`;
+    if(type==='agendamento_psicologo') return `Nome: ${d.name||'-'} | RG: ${d.rg||'-'} | ${d.day||'-'} ${d.time||''}`;
+    return JSON.stringify(d);
+  }
+  function renderRH(){
+    const tbody = document.querySelector('#rhTable tbody'); if(!tbody) return;
+    const tsel = document.getElementById('fType'); const txt = document.getElementById('fText');
+    let all = getAll();
+    const total = all.length;
+    document.getElementById('badgeTotal').textContent = total + ' registros';
+    const fType = (tsel && tsel.value)||'';
+    const fText = (txt && (txt.value||'').toLowerCase())||'';
+    if(fType) all = all.filter(r=> r.type===fType);
+    if(fText) all = all.filter(r=> JSON.stringify(r).toLowerCase().includes(fText));
+    tbody.innerHTML = all.map(r=> `<tr><td>${r.type}</td><td>${rowData(r)}</td><td>${new Date(r.createdAt).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="3" style="opacity:.8">Sem registros.</td></tr>';
+  }
+  const fType = document.getElementById('fType'); if(fType) fType.addEventListener('change', renderRH);
+  const fText = document.getElementById('fText'); if(fText) fText.addEventListener('input', renderRH);
+
+  // Export CSV
+  function toCSV(arr){
+    const head = ['tipo','dados','criado_em'];
+    const rows = arr.map(r=> [r.type, rowData(r).replace(/
+/g,' ').replace(/"/g,'""'), new Date(r.createdAt).toISOString()]);
+    const csv = [head.join(','), ...rows.map(r=> r.map(x=> `"${x}"`).join(','))].join('
+');
+    return csv;
+  }
+  function exportCSV(){
+    const all = getAll();
+    const csv = toCSV(all);
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'linha-de-solucao-registros.csv'; a.click();
+    setTimeout(()=> URL.revokeObjectURL(url), 1000);
+  }
+  const btnExport = document.getElementById('btnExport'); if(btnExport) btnExport.addEventListener('click', exportCSV);
+
+  // Hint toast (first load)
+  setTimeout(()=> toast('Painel RH: use Ctrl + Shift + R'), 800);
+})();
+</script>
 </body>
 </html>
