@@ -1070,48 +1070,5 @@ button:hover::after{ left:120%; top:-40%; }
   setTimeout(()=> toast('Painel RH: use Ctrl + Shift + R'), 800);
 })();
 </script>
-
-<script>
-// Helpers robustos para o menu (idempotentes)
-(function(){
-  try {
-    function hideAll(){ document.querySelectorAll('.menu').forEach(m=>m.classList.add('hidden')); }
-    function showSection(id){
-      try{
-        hideAll();
-        var el = document.getElementById(id);
-        if(el) el.classList.remove('hidden');
-        // Garante que o menu principal some ao abrir seção
-        var main = document.getElementById('mainMenu');
-        if(main && id !== 'mainMenu') main.classList.add('hidden');
-      }catch(e){ console.error('[LS] showSection erro', e); }
-    }
-    function backToMenu(){
-      try{
-        hideAll();
-        var main = document.getElementById('mainMenu');
-        if(main) main.classList.remove('hidden');
-      }catch(e){ console.error('[LS] backToMenu erro', e); }
-    }
-    // Expõe globais apenas uma vez
-    if(!window.showSection) window.showSection = showSection;
-    if(!window.backToMenu) window.backToMenu = backToMenu;
-
-    // Liga cliques dos botões se ainda não tiverem listener
-    document.addEventListener('DOMContentLoaded', function(){
-      // Se existir menu principal, garante que está visível no início
-      var main = document.getElementById('mainMenu');
-      if(main) {
-        main.classList.remove('hidden');
-      }
-      // Botões com data-section
-      document.querySelectorAll('[data-section]').forEach(function(btn){
-        btn.addEventListener('click', function(){ showSection(btn.getAttribute('data-section')); });
-      });
-    });
-  } catch (e) { console.error('[LS] helpers init fail', e); }
-})();
-</script>
-
 </body>
 </html>
